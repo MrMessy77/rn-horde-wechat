@@ -1,6 +1,6 @@
 {
   "name": "rn-horde-wechat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "微信开放sdk rn模块，支持分享、支付、拉起微信客服、拉起小程序。",
   "main": "index.js",
   "scripts": {

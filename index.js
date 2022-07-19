@@ -146,6 +146,7 @@ export const openWXApp = wrapApi(WeChat.openWXApp);
 // wrap the APIs
 const nativeShareToTimeline = wrapApi(WeChat.shareToTimeline);
 const nativeLaunchMiniProgram = wrapApi(WeChat.launchMiniProgram);
+const nativeOpenCustomerService = wrapApi(WeChat.openCustomerService);
 const nativeShareToSession = wrapApi(WeChat.shareToSession);
 const nativeShareToFavorite = wrapApi(WeChat.shareToFavorite);
 const nativeSendAuthRequest = wrapApi(WeChat.sendAuthRequest);
@@ -394,6 +395,35 @@ export function launchMiniProgram({ userName, miniProgramType = 0, path = '' }) 
     }
     nativeLaunchMiniProgram({ userName, miniProgramType, path });
     emitter.once('WXLaunchMiniProgramReq.Resp', (resp) => {
+      if (resp.errCode === 0) {
+        resolve(resp);
+      } else {
+        reject(new WechatError(resp));
+      }
+    });
+  });
+}
+
+/**
+ * 拉起微信客服
+ * @method launchMini
+ * @param
+ * @param {String} corpId - 企业ID
+ * @param {String} url - 客服URL
+ */
+ export function openCustomerService({ corpId, url }) {
+  return new Promise((resolve, reject) => {
+    if (!corpId && !url) {
+      reject(
+        new WechatError({
+          errStr: '企业ID或客服URL为空',
+          errCode: -1,
+        }),
+      );
+      return;
+    }
+    nativeOpenCustomerService({ corpId, url });
+    emitter.once('WXOpenCustomerServiceReq.Resp', (resp) => {
       if (resp.errCode === 0) {
         resolve(resp);
       } else {

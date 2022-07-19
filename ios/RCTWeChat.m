@@ -53,6 +53,13 @@ RCT_EXPORT_MODULE()
     return YES;
 }
 
+- (NSArray<NSString *> *)supportedEvents {
+    return @[
+        RCTWXEventName,
+        RCTWXEventNameWeChatReq
+    ];
+}
+
 // 获取网络图片的公共方法
 - (UIImage *) getImageFromURL:(NSString *)fileURL {
     UIImage * result;
@@ -230,7 +237,7 @@ RCT_EXPORT_METHOD(shareText:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = YES;
     req.text = data[@"text"];
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -277,7 +284,7 @@ RCT_EXPORT_METHOD(shareFile:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -321,7 +328,7 @@ RCT_EXPORT_METHOD(shareImage:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     //    [WXApi sendReq:req];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
@@ -366,7 +373,7 @@ RCT_EXPORT_METHOD(shareLocalImage:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     //    [WXApi sendReq:req];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
@@ -400,7 +407,7 @@ RCT_EXPORT_METHOD(shareMusic:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -429,7 +436,7 @@ RCT_EXPORT_METHOD(shareVideo:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -457,7 +464,7 @@ RCT_EXPORT_METHOD(shareWebpage:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -497,7 +504,7 @@ RCT_EXPORT_METHOD(shareMiniProgram:(NSDictionary *)data
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.message = message;
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     void ( ^ completion )( BOOL );
     completion = ^( BOOL success )
     {
@@ -512,7 +519,7 @@ RCT_EXPORT_METHOD(subscribeMessage:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
 {
     WXSubscribeMsgReq *req = [[WXSubscribeMsgReq alloc] init];
-    req.scene = [data[@"scene"] integerValue];
+    req.scene = [data[@"scene"] intValue];
     req.templateId = data[@"templateId"];
     req.reserved = data[@"reserved"];
     void ( ^ completion )( BOOL );
@@ -545,6 +552,23 @@ RCT_EXPORT_METHOD(launchMiniProgram:(NSDictionary *)data
     // callback(@[success ? [NSNull null] : INVOKE_FAILED]);
 }
 
+RCT_EXPORT_METHOD(openCustomerService:(NSDictionary *)data
+                  :(RCTResponseSenderBlock)callback)
+{
+    WXOpenCustomerServiceReq *openCustomerServiceReq = [[WXOpenCustomerServiceReq alloc] init];
+    openCustomerServiceReq.corpid = data[@"corpId"];//企业ID
+    openCustomerServiceReq.url = data[@"url"];//客服URL
+    void ( ^ completion )( BOOL );
+    completion = ^( BOOL success )
+    {
+        callback(@[success ? [NSNull null] : INVOKE_FAILED]);
+        return;
+    };
+    [WXApi sendReq:openCustomerServiceReq completion:completion];
+    // BOOL success = [WXApi sendReq:launchMiniProgramReq];
+    // callback(@[success ? [NSNull null] : INVOKE_FAILED]);
+}
+
 RCT_EXPORT_METHOD(pay:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
 {
@@ -571,14 +595,14 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
 -(void) onReq:(BaseReq*)req
 {
     if ([req isKindOfClass:[LaunchFromWXReq class]]) {
-        LaunchFromWXReq *launchReq = req;
+        LaunchFromWXReq *launchReq = (LaunchFromWXReq *)req;
         NSString *appParameter = launchReq.message.messageExt;
         NSMutableDictionary *body = @{@"errCode":@0}.mutableCopy;
         body[@"type"] = @"LaunchFromWX.Req";
         body[@"lang"] =  launchReq.lang;
         body[@"country"] = launchReq.country;
         body[@"extMsg"] = appParameter;
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventNameWeChatReq body:body];
+        [self sendEventWithName:RCTWXEventNameWeChatReq body:body];
     }
 }
 
@@ -593,7 +617,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         body[@"lang"] = r.lang;
         body[@"country"] =r.country;
         body[@"type"] = @"SendMessageToWX.Resp";
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+        [self sendEventWithName:RCTWXEventName body:body];
     } else if ([resp isKindOfClass:[SendAuthResp class]]) {
         SendAuthResp *r = (SendAuthResp *)resp;
         NSMutableDictionary *body = @{@"errCode":@(r.errCode)}.mutableCopy;
@@ -607,11 +631,11 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
             if (self.appId && r) {
                 // ios第一次获取不到appid会卡死，加个判断OK
                 [body addEntriesFromDictionary:@{@"appid":self.appId, @"code":r.code}];
-                [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+                [self sendEventWithName:RCTWXEventName body:body];
             }
         }
         else {
-            [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+            [self sendEventWithName:RCTWXEventName body:body];
         }
     } else if ([resp isKindOfClass:[PayResp class]]) {
         PayResp *r = (PayResp *)resp;
@@ -620,14 +644,14 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         body[@"type"] = @(r.type);
         body[@"returnKey"] =r.returnKey;
         body[@"type"] = @"PayReq.Resp";
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+        [self sendEventWithName:RCTWXEventName body:body];
     } else if ([resp isKindOfClass:[WXLaunchMiniProgramResp class]]){
         WXLaunchMiniProgramResp *r = (WXLaunchMiniProgramResp *)resp;
         NSMutableDictionary *body = @{@"errCode":@(r.errCode)}.mutableCopy;
         body[@"errStr"] = r.errStr;
         body[@"extMsg"] = r.extMsg;
         body[@"type"] = @"WXLaunchMiniProgramReq.Resp";
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+        [self sendEventWithName:RCTWXEventName body:body];
     } else if ([resp isKindOfClass:[WXChooseInvoiceResp class]]){
         WXChooseInvoiceResp *r = (WXChooseInvoiceResp *)resp;
         NSMutableDictionary *body = @{@"errCode":@(r.errCode)}.mutableCopy;
@@ -639,7 +663,14 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         }
         body[@"cards"] = arr;
         body[@"type"] = @"WXChooseInvoiceResp.Resp";
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+        [self sendEventWithName:RCTWXEventName body:body];
+    } else if ([resp isKindOfClass:[WXOpenCustomerServiceResp class]]) {
+        WXOpenCustomerServiceResp *r = (WXOpenCustomerServiceResp *)resp;
+        NSMutableDictionary *body = @{@"errCode":@(r.errCode)}.mutableCopy;
+        body[@"errStr"] = r.errStr;
+        body[@"extMsg"] = r.extMsg;
+        body[@"type"] = @"WXOpenCustomerServiceReq.Resp";
+        [self sendEventWithName:RCTWXEventName body:body];
     }
 }
 

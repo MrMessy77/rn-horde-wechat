@@ -101,6 +101,10 @@ declare module 'react-native-wechat-lib' {
     miniProgramType?: number;
     path?: string;
   }
+  export interface OpenCustomerService {
+    corpId: string;
+    url: string;
+  }
 
   export interface SubscribeMessageMetadata {
     scene?: WXScene;
@@ -131,6 +135,9 @@ declare module 'react-native-wechat-lib' {
   ): Promise<{ errCode?: number; errStr?: string }>;
   export function launchMiniProgram(
     message: LaunchMiniProgramMetadata,
+  ): Promise<{ errCode?: number; errStr?: string }>;
+  export function openCustomerService(
+    message: OpenCustomerService,
   ): Promise<{ errCode?: number; errStr?: string }>;
   export function subscribeMessage(
     message: SubscribeMessageMetadata,

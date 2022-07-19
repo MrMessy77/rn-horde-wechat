@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#import <React/RCTEventEmitter.h>
 #import <React/RCTBridgeModule.h>
 #import "WXApi.h"
 
@@ -24,7 +25,7 @@
 #define RCTWXEventName @"WeChat_Resp"
 #define RCTWXEventNameWeChatReq @"WeChat_Req"
 
-@interface RCTWeChat : NSObject <RCTBridgeModule, WXApiDelegate>
+@interface RCTWeChat : RCTEventEmitter <RCTBridgeModule, WXApiDelegate>
 
 @property NSString* appId;
 

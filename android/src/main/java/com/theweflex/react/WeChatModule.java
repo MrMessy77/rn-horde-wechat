@@ -46,6 +46,7 @@ import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.modelpay.PayResp;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.modelbiz.WXOpenCustomerServiceChat;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -611,6 +612,19 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         if (!success) callback.invoke(INVALID_ARGUMENT);
     }
 
+    @ReactMethod
+    public void openCustomerService(ReadableMap data, Callback callback) {
+        if (api == null) {
+            callback.invoke(NOT_REGISTERED);
+            return;
+        }
+        WXOpenCustomerServiceChat.Req req = new WXOpenCustomerServiceChat.Req();
+        req.corpId = data.getString("corpId");// 企业ID
+        req.url = data.getString("url");// 客服URL
+        boolean success = api.sendReq(req);
+        if (!success) callback.invoke(INVALID_ARGUMENT);
+    }
+
     /**
      * 一次性订阅消息
      *
@@ -988,6 +1002,9 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             ChooseCardFromWXCardPackage.Resp resp = (ChooseCardFromWXCardPackage.Resp) baseResp;
             map.putString("type", "WXChooseInvoiceResp.Resp");
             map.putString("cardItemList", resp.cardItemList);
+        } else if (baseResp.getType() == ConstantsAPI.COMMAND_OPEN_CUSTOMER_SERVICE_CHAT) {
+            WXOpenCustomerServiceChat.Resp resp = (WXOpenCustomerServiceChat.Resp) baseResp;
+            map.putString("type", "WXOpenCustomerServiceReq.Resp");
         }
 
         this.getReactApplicationContext()

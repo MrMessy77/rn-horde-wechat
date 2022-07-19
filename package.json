@@ -1,0 +1,35 @@
+{
+  "name": "rn-horde-wechat",
+  "version": "1.0.0",
+  "description": "微信开放sdk rn模块，支持分享、支付、拉起微信客服、拉起小程序。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MrMessy77/rn-horde-wechat.git"
+  },
+  "keywords": [
+    "wechat",
+    "react-native",
+    "react",
+    "react-component",
+    "ios"
+  ],
+  "dependencies": {
+    "events": "1.0.1"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.40"
+  },
+  "author": {
+    "name": "MrMessy",
+    "email": "313691730@qq.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MrMessy77/rn-horde-wechat/issues"
+  },
+  "homepage": "https://github.com/MrMessy77/rn-horde-wechat#readme"
+}
